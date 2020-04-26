@@ -19,20 +19,22 @@ class RouteCollector extends Generator {
       final path = buildStep.inputId.path;
       final package = buildStep.inputId.package;
       final import = "package:$package/${path.replaceFirst('lib/', '')}";
-      final routeName = annotatedElement.annotation.peek('scheme') ?? className;
+      final routeName =
+          annotatedElement.annotation.peek('scheme')?.stringValue ?? className;
       routeInfoList.add(RouteInfo(import, routeName, className,
           findParamFromClassElement(annotatedElement.element)));
     }
     return null;
   }
 
-  List<String> findParamFromClassElement(Element element) {
-    final paramKeyList = <String>[];
+  List<ParamInfo> findParamFromClassElement(Element element) {
+    final paramKeyList = <ParamInfo>[];
     if (element is ClassElement) {
       for (var annotatedElement in pageParamWith(element)) {
         String fieldName = annotatedElement.element.displayName;
-        String fieldKey = annotatedElement.annotation.peek('key')?.stringValue ?? fieldName;
-        paramKeyList.add(fieldKey);
+        String fieldKey =
+            annotatedElement.annotation.peek('key')?.stringValue ?? fieldName;
+        paramKeyList.add(ParamInfo(fieldName, fieldKey));
       }
     } else {
       throw Exception('PageRoute must be decorated on class');
