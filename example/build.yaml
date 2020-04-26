@@ -14,6 +14,6 @@ builders:
     import: 'package:flutter_route_apt/builder.dart'
     builder_factories: ['routeCollectorAllPackages']
     build_extensions: { '.dart': ['.collector_all_packages.dart'] }
-    auto_apply: all_packages
+    auto_apply: root_package
     runs_before: ["route_generator|route_builder"]
     build_to: cache
