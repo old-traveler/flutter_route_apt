@@ -1,6 +1,6 @@
 # flutter_route_apt
 
-A new Flutter package project.
+A Dart apt for route
 
 ## Getting Started
 
