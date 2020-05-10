@@ -10,10 +10,15 @@ import 'RouteInfo.dart';
 const TypeChecker pageRoute = TypeChecker.fromRuntime(RoutePage);
 const TypeChecker pageParam = TypeChecker.fromRuntime(PageParam);
 
-List<RouteInfo> routeInfoList = [];
+Set<RouteInfo> routeInfoList = Set();
+Map<String, Set<RouteInfo>> routeRecord = {};
+bool rewrite = false;
 
 class RouteCollector extends Generator {
   FutureOr<String> generate(LibraryReader library, BuildStep buildStep) async {
+    // dart文件路径
+    final inputId = buildStep.inputId.toString();
+    Set<RouteInfo> stepRoute = Set();
     for (var annotatedElement in library.annotatedWith(pageRoute)) {
       final className = annotatedElement.element.displayName;
       final path = buildStep.inputId.path;
@@ -21,9 +26,17 @@ class RouteCollector extends Generator {
       final import = "package:$package/${path.replaceFirst('lib/', '')}";
       final routeName =
           annotatedElement.annotation.peek('scheme')?.stringValue ?? className;
-      routeInfoList.add(RouteInfo(import, routeName, className,
+      stepRoute.add(RouteInfo(import, routeName, className,
           findParamFromClassElement(annotatedElement.element)));
+      rewrite = true;
     }
+    // 如果上一次的记录存在则清除上次记录
+    if (routeRecord[inputId]?.isNotEmpty == true) {
+      rewrite = true;
+      routeInfoList.removeAll(routeRecord[inputId]);
+    }
+    routeInfoList.addAll(stepRoute);
+    routeRecord[inputId] = stepRoute;
     return null;
   }
 

@@ -10,6 +10,17 @@ class RouteInfo {
   String toString() {
     return '\nimport: $import\nname: $name\nclassName: $className\nparams: $params';
   }
+
+  @override
+  bool operator ==(other) {
+    if (other is! RouteInfo) {
+      return false;
+    }
+    return this.name == other.name;
+  }
+
+  @override
+  int get hashCode => name.hashCode;
 }
 
 class ParamInfo {
