@@ -25,7 +25,13 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
                 second: settings.arguments,
               ));
     case 'TenPage':
-      return MaterialPageRoute(builder: (context) => TenPage());
+      Map<String, dynamic> map = settings.arguments;
+      return MaterialPageRoute(
+          builder: (context) => TenPage(
+                name: map['tenPageName'],
+                age: map['tenPageAge'],
+                sex: map['sex'],
+              ));
     case 'lianjiabeikeft://home':
       Map<String, dynamic> map = settings.arguments;
       return MaterialPageRoute(

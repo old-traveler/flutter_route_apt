@@ -1,32 +1,35 @@
 import 'dart:async';
 
 import 'package:build/build.dart';
+import 'package:dart_style/dart_style.dart';
 import 'package:flutter_route_apt/RouteInfo.dart';
 import 'package:flutter_route_apt/annotation/route_page.dart';
 import 'package:flutter_route_apt/route_collector.dart';
 import 'package:source_gen/source_gen.dart';
 
 const TypeChecker routeChecker = TypeChecker.fromRuntime(AppRoute);
-AssetId outputId;
+AssetId outputId = AssetId('example', 'lib/main.route.dart');
 
 class RouteGenerator extends Generator {
   FutureOr<String> generate(LibraryReader library, BuildStep buildStep) async {
     if (library.annotatedWith(routeChecker).isNotEmpty) {
-      outputId = AssetId(buildStep.inputId.package,
-          buildStep.inputId.path.replaceFirst('.dart', '.route.dart'));
       return outputAsString();
     }
-    if (rewrite && outputId != null) {
-      buildStep.writeAsString(outputId, outputAsString());
+    if (rewrite) {
+      buildStep.writeAsString(
+          outputId, DartFormatter().format(outputAsString(needHeader: true)));
     }
     return null;
   }
 
-  String outputAsString() {
+  String outputAsString({bool needHeader: false}) {
     rewrite = false;
     final routeList = routeInfoList.toList()
       ..sort((a, b) => a.name.compareTo(b.name));
     StringBuffer stringBuffer = StringBuffer();
+    if (needHeader) {
+      stringBuffer.write(getGeneratorHeader());
+    }
     stringBuffer.write('import \'package:flutter/material.dart\';\n');
     for (var routeInfo in routeList) {
       stringBuffer.write('import \'${routeInfo.import}\';\n');
@@ -63,5 +66,16 @@ class RouteGenerator extends Generator {
       stringBuffer.write('${value.paramName}: map[\'${value.mapKey}\'],');
     }
     return stringBuffer.toString();
+  }
+
+  String getGeneratorHeader() {
+    return '''
+    // GENERATED CODE - DO NOT MODIFY BY HAND
+
+    // **************************************************************************
+    // RouteGenerator
+    // **************************************************************************
+    
+    ''';
   }
 }

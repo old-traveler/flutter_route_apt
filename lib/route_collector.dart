@@ -12,6 +12,8 @@ const TypeChecker pageParam = TypeChecker.fromRuntime(PageParam);
 
 Set<RouteInfo> routeInfoList = Set();
 Map<String, Set<RouteInfo>> routeRecord = {};
+/// watch模式下是增量编译，并不会收集到原有的Route信息
+/// 所以会导致覆盖掉原有的数据，暂时无法使用
 bool rewrite = false;
 
 class RouteCollector extends Generator {
